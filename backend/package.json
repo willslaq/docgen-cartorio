@@ -1,0 +1,15 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend da aplicação de gerenciamento de cartórios",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "backend",
+    "api"
+  ],
+  "author": "Willinghan B. Tomaz",
+  "license": "ISC"
+}
