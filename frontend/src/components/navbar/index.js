@@ -31,6 +31,9 @@ const useStyles = makeStyles(theme => ({
     },
     titulo: {
         flexGrow: 1,
+        [theme.breakpoints.down('sm')]: {
+            fontSize: '0.8em',
+        },
     },
     list: {
         width: 250,
@@ -185,13 +188,17 @@ function NavBar({ history }) {
 
                     <Grid container>
                         <Grid item xs={12}>
-                            <Typography variant="h6" className={classes.titulo}>
+                            <Typography 
+                                align="center"    
+                                variant="h6" 
+                                className={classes.titulo}
+                            >
                                 Cartório de Registro Civil Nossa Senhora
                             </Typography>
                         </Grid>
 
                         <Grid item xs={12}>
-                            <Typography variant="h6" className={classes.titulo}>
+                            <Typography align="center" variant="h6" className={classes.titulo}>
                                 3622 8175
                             </Typography>
                         </Grid>
