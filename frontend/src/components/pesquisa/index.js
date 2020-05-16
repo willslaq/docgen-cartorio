@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -11,25 +11,44 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import { makeStyles } from '@material-ui/core/styles';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const filter = createFilterOptions();
 
+const useStyles = makeStyles(theme => ({
+    formControl: {
+        minWidth: 100,
+    }
+}))
+
+
 export default function FreeSoloCreateOptionDialog() {
-    const [value, setValue] = React.useState(null);
-    const [open, toggleOpen] = React.useState(false);
+    const [value, setValue] = useState(null);
+    const [open, toggleOpen] = useState(false);
+
+
+    const [filtro, setFiltro] = useState(1);
+
+    const classes = useStyles();
 
     const handleClose = () => {
         setDialogValue({
             nome: '',
             cpf: '',
+            rg: '',
         });
 
         toggleOpen(false);
     };
 
-    const [dialogValue, setDialogValue] = React.useState({
+    const [dialogValue, setDialogValue] = useState({
         nome: '',
         cpf: '',
+        rg: '',
     });
 
     const handleSubmit = (event) => {
@@ -37,15 +56,44 @@ export default function FreeSoloCreateOptionDialog() {
         setValue({
             nome: dialogValue.nome,
             cpf: dialogValue.cpf,
+            rg: dialogValue.rg,
         });
 
         handleClose();
     };
 
+    const handleChangeFiltro = event => {
+        setFiltro(event.target.value);
+    }
+
+    function SelecionaFiltros() {
+
+        return (
+            <FormControl className={classes.formControl}>
+                <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={filtro}
+                    onChange={handleChangeFiltro}
+                >
+                    <MenuItem value={1}>Nome</MenuItem>
+                    <MenuItem value={2}>CPF</MenuItem>
+                    <MenuItem value={3}>RG</MenuItem>
+                </Select>
+            </FormControl>
+        )
+    }
+
     return (
         <React.Fragment>
             <Grid container style={{ marginTop: 50 }}>
-                <Grid item xs={12} align="center">
+                <Grid item xs={6} align="right">
+                    <Paper color="primary">
+                        <SelecionaFiltros />
+                    </Paper>
+                </Grid>
+                <Grid item xs={6} align="left">
                     <Autocomplete
                         value={value}
                         onChange={(event, newValue) => {
@@ -53,20 +101,50 @@ export default function FreeSoloCreateOptionDialog() {
                                 // timeout to avoid instant validation of the dialog's form.
                                 setTimeout(() => {
                                     toggleOpen(true);
-                                    setDialogValue({
-                                        nome: newValue,
-                                        cpf: '',
-                                    });
+                                    if (filtro === 1) {
+                                        setDialogValue({
+                                            nome: newValue,
+                                            cpf: '',
+                                            rg: '',
+                                        });
+                                    } else if (filtro === 2) {
+                                        setDialogValue({
+                                            nome: '',
+                                            cpf: newValue,
+                                            rg: '',
+                                        })
+                                    } else {
+                                        setDialogValue({
+                                            nome: '',
+                                            cpf: '',
+                                            rg: newValue,
+                                        })
+                                    }
                                 });
                                 return;
                             }
 
                             if (newValue && newValue.inputValue) {
                                 toggleOpen(true);
-                                setDialogValue({
-                                    nome: newValue.inputValue,
-                                    cpf: '',
-                                });
+                                if (filtro === 1) {
+                                    setDialogValue({
+                                        nome: newValue.inputValue,
+                                        cpf: '',
+                                        rg: '',
+                                    });
+                                } else if (filtro === 2) {
+                                    setDialogValue({
+                                        nome: '',
+                                        cpf: newValue.inputValue,
+                                        rg: '',
+                                    });
+                                } else {
+                                    setDialogValue({
+                                        nome: '',
+                                        cpf: '',
+                                        rg: newValue.inputValue,
+                                    });
+                                }
 
                                 return;
                             }
@@ -77,10 +155,22 @@ export default function FreeSoloCreateOptionDialog() {
                             const filtered = filter(options, params);
 
                             if (params.inputValue !== '') {
-                                filtered.push({
-                                    inputValue: params.inputValue,
-                                    nome: `Adicionar CPF: "${params.inputValue}"`,
-                                });
+                                if (filtro === 1) {
+                                    filtered.push({
+                                        inputValue: params.inputValue,
+                                        nome: `Adicionar Pessoa: "${params.inputValue}"`,
+                                    });
+                                } else if (filtro === 2) {
+                                    filtered.push({
+                                        inputValue: params.inputValue,
+                                        nome: `Adicionar o CPF: "${params.inputValue}"`
+                                    })
+                                } else {
+                                    filtered.push({
+                                        inputValue: params.inputValue,
+                                        nome: `Adicionar o RG: "${params.inputValue}"`
+                                    })
+                                }
                             }
 
                             return filtered;
@@ -132,7 +222,7 @@ export default function FreeSoloCreateOptionDialog() {
                     <DialogTitle id="form-dialog-title">Adicionar um novo cliente</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Está tentando utilizar um CPF não cadastrado? Cadastre aqui:
+                            Está tentando utilizar {filtro} não cadastrado? Cadastre aqui:
                         </DialogContentText>
                         <TextField
                             autoFocus
@@ -151,14 +241,14 @@ export default function FreeSoloCreateOptionDialog() {
                             label="CPF"
                             type="text"
                         />
-                        {/* <TextField
+                        <TextField
                             margin="dense"
                             id="name"
-                            value={dialogValue.cpf}
+                            value={dialogValue.rg}
                             onChange={(event) => setDialogValue({ ...dialogValue, rg: event.target.value })}
                             label="RG"
                             type="text"
-                        /> */}
+                        />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose} color="primary">
@@ -176,30 +266,30 @@ export default function FreeSoloCreateOptionDialog() {
 
 
 const resultadoPessoa = [
-    { nome: 'Willinghan B. Tomaz', cpf: '10041574958' },
-    { nome: 'Vinicius', cpf: '10041574958' },
-    { nome: 'Leandro', cpf: '10041574958' },
-    { nome: 'Willian', cpf: '10041574958' },
-    { nome: 'Gerson', cpf: '10041574958' },
-    { nome: 'Maria', cpf: '10041574958' },
-    { nome: 'Leopolda', cpf: '10041574958' },
-    { nome: 'Tunica', cpf: '10041574958' },
-    { nome: 'Margarete', cpf: '10041574958' },
-    { nome: 'Josefa', cpf: '10041574958' },
-    { nome: 'Cleiton', cpf: '10041574958' },
-    { nome: 'Cremilda', cpf: '10041574958' },
-    { nome: 'Josefina', cpf: '10041574958' },
-    { nome: 'Josesclaudilene', cpf: '10041574958' },
-    { nome: 'Targarida', cpf: '10041574958' },
-    { nome: 'Gunhild', cpf: '10041574958' },
-    { nome: 'Gofrid', cpf: '10041574958' },
-    { nome: 'Frey', cpf: '10041574958' },
-    { nome: 'Freya', cpf: '10041574958' },
-    { nome: 'Tyr', cpf: '10041574958' },
-    { nome: 'Odin', cpf: '10041574958' },
-    { nome: 'Thor', cpf: '10041574958' },
-    { nome: 'Skati', cpf: '10041574958' },
-    { nome: 'Fenrir', cpf: '10041574958' },
+    { nome: 'Willinghan B. Tomaz', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Vinicius', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Leandro', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Willian', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Gerson', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Maria', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Leopolda', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Tunica', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Margarete', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Josefa', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Cleiton', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Cremilda', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Josefina', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Josesclaudilene', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Targarida', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Gunhild', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Gofrid', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Frey', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Freya', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Tyr', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Odin', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Thor', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Skati', cpf: '10041574958', rg: '143935957' },
+    { nome: 'Fenrir', cpf: '10041574958', rg: '143935957' },
 ];
 
 
