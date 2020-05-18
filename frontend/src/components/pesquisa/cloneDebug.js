@@ -17,6 +17,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 
+
+import CardPessoa from '../CardPessoa/cloneDebug';
+
 const filter = createFilterOptions();
 
 const useStyles = makeStyles(theme => ({
@@ -193,13 +196,6 @@ export default function FreeSoloCreateOptionDialog() {
                         renderOption={(option) => option.nome}
                         style={{ width: 300 }}
                         freeSolo
-                        inputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            )
-                        }}    
                         renderInput={(params) => (
                             <Paper>
                                 <Grid containe xs={12}>
