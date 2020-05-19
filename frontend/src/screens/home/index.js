@@ -5,8 +5,8 @@ import Container from '@material-ui/core/Container';
 // import FreeSoloCreateOptionDialog from '../../components/pesquisa/index';
 import FreeSoloCreateOptionDialog from '../../components/Pesquisa/cloneDebug';
 
-// import CardPessoa from '../../components/CardPessoa/index';
-import CardPessoa from '../../components/CardPessoa/cloneDebug';
+import CardPessoa from '../../components/CardPessoa/index';
+// import CardPessoa from '../../components/CardPessoa/cloneDebug';
 
 export default function Home() {
     return (
