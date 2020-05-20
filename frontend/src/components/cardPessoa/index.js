@@ -23,6 +23,10 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
+import PhoneIcon from '@material-ui/icons/Phone';
+import ContactMailIcon from '@material-ui/icons/ContactMail';
+import PersonIcon from '@material-ui/icons/Person';
 
 const useStyles = makeStyles(theme => ({
     controlaPaper: {
@@ -70,6 +74,12 @@ const useStyles = makeStyles(theme => ({
         height: 100,
         color: '#72bf44',
     },
+    dialogPadding: {
+        padding: theme.spacing(2),
+    },
+    dialogForm: {
+        width: '100%',
+    }
 }))
 
 export default function CardPessoa() {
@@ -96,6 +106,7 @@ export default function CardPessoa() {
     };
 
     const handleSubmit = (event) => {
+        console.log("Salvei no banco: ", dialogValue.cpf, dialogValue.nome, dialogValue.rg)
         event.preventDefault();
         setValue({
             nome: dialogValue.nome,
@@ -104,24 +115,39 @@ export default function CardPessoa() {
         });
     };
 
+    function handleDialog() {
+            toggleOpen(true);
+            if(filtro === 1) {
+                setDialogValue({
+                    nome: pesquisa,
+                    cpf: '',
+                    rg: '',
+                });
+            } else {
+                setDialogValue({
+                    nome: '',
+                    cpf: pesquisa,
+                    rg: '',
+                });
+            }
+    };
+
     let pessoaFiltrada = resultadoPessoa.filter(
         (pessoa) => {
             if (filtro === 1) {
                 return pessoa.nome.toLowerCase().indexOf(pesquisa) !== -1;
-            } else if (filtro === 2) {
+            } else {
                 return pessoa.cpf.toLowerCase().indexOf(pesquisa) !== -1;
             }
-            return pessoa.rg.toLowerCase().indexOf(pesquisa) !== -1;
         }
     );
 
     function retornoVazio() {
         if (filtro === 1) {
             return <>Adicionar o Cliente "{pesquisa}"</>;
-        } else if (filtro === 2) {
+        } else {
             return <>Adicionar o CPF "{pesquisa}"</>;
         }
-        return <>Adicionar o RG "{pesquisa}"</>;
     };
 
     const handleChangeFiltro = event => {
@@ -141,7 +167,6 @@ export default function CardPessoa() {
                     >
                         <MenuItem value={1}>Nome</MenuItem>
                         <MenuItem value={2}>CPF</MenuItem>
-                        <MenuItem value={3}>RG</MenuItem>
                     </Select>
                 </FormControl>
                 <Paper className={classes.paperPesquisa}>
@@ -235,60 +260,7 @@ export default function CardPessoa() {
                                     </Typography>
                                 </Grid>
                                 <Grid item align="center" xs={4}>
-                                    <IconButton aria-label="Add" onClick={(event, newValue) => {
-                                        if (typeof newValue === 'string') {
-                                            // setTimeout(() => {
-                                                toggleOpen(true);
-                                                if (filtro === 1) {
-                                                    setDialogValue({
-                                                        nome: newValue,
-                                                        cpf: '',
-                                                        rg: '',
-                                                    });
-                                                } else if (filtro === 2) {
-                                                    setDialogValue({
-                                                        nome: '',
-                                                        cpf: newValue,
-                                                        rg: '',
-                                                    });
-                                                } else {
-                                                    setDialogValue({
-                                                        nome: '',
-                                                        cpf: '',
-                                                        rg: newValue,
-                                                    });
-                                                }
-                                            // });
-                                            return;
-                                        }
-
-                                        if (newValue && newValue.inputValue) {
-                                            toggleOpen(true);
-                                            if (filtro === 1) {
-                                                setDialogValue({
-                                                    nome: newValue.inputValue,
-                                                    cpf: '',
-                                                    rg: '',
-                                                });
-                                            } else if (filtro === 2) {
-                                                setDialogValue({
-                                                    nome: '',
-                                                    cpf: newValue.inputValue,
-                                                    rg: '',
-                                                });
-                                            } else {
-                                                setDialogValue({
-                                                    nome: '',
-                                                    cpf: '',
-                                                    rg: newValue.inputValue,
-                                                });
-                                            }
-            
-                                            return;
-                                        }
-
-                                        setValue(newValue);
-                                    }}>
+                                    <IconButton aria-label="Add" onClick={handleDialog}>
                                         <AddCircleIcon className={classes.controlaArrow} />
                                     </IconButton>
                                 </Grid>
@@ -296,41 +268,133 @@ export default function CardPessoa() {
 
                             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                                 <form onSubmit={handleSubmit}>
-                                    {console.log("entrei no dialog")}
                                     <DialogTitle id="form-dialog-title">Adicionar um novo cliente</DialogTitle>
                                     <DialogContent>
                                         <DialogContentText>
                                             Está tentando utilizar um cliente não cadastrado? Cadastre aqui:
                                         </DialogContentText>
-                                        <TextField 
-                                            autoFocus
-                                            label="Nome"
-                                            margin="dense"
-                                            id="name"
-                                            value={dialogValue.nome}
-                                            onChange={(event) => setDialogValue({...dialogValue, nome: event.target.value})}
-                                        />
-                                        <TextField 
-                                            autoFocus
-                                            label="CPF"
-                                            margin="dense"
-                                            id="name"
-                                            value={dialogValue.nome}
-                                            onChange={(event) => setDialogValue({...dialogValue, nome: event.target.value})}
-                                        />
-                                        <TextField 
-                                            autoFocus
-                                            margin="dense"
-                                            id="RG"
-                                            value={dialogValue.nome}
-                                            onChange={(event) => setDialogValue({...dialogValue, nome: event.target.value})}
-                                        />
+                                        <Grid container className={classes.dialogPadding}>
+                                            <Grid item xs={12} className={classes.dialogPadding}>
+                                                <Grid container spacing={1} position="start">
+                                                    <Grid item>
+                                                        <PersonIcon />
+                                                    </Grid>
+                                                    <Grid item  className={classes.dialogForm}>
+                                                        <TextField 
+                                                            autoFocus
+                                                            label="Nome"
+                                                            className={classes.dialogForm}
+                                                            margin="dense"
+                                                            id="name"
+                                                            value={dialogValue.nome}
+                                                            onChange={(event) => setDialogValue({
+                                                                ...dialogValue, nome: event.target.value
+                                                            })}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid item xs={6} className={classes.dialogPadding}>
+                                                <TextField 
+                                                    autoFocus
+                                                    label="CPF"
+                                                    className={classes.dialogForm}
+                                                    margin="dense"
+                                                    id="CPF"
+                                                    value={dialogValue.cpf}
+                                                    onChange={(event) => setDialogValue({
+                                                        ...dialogValue, cpf: event.target.value
+                                                    })}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6} className={classes.dialogPadding}>
+                                                <TextField 
+                                                    label="RG"
+                                                    autoFocus
+                                                    margin="dense"
+                                                    id="RG"
+                                                    className={classes.dialogForm}
+                                                    value={dialogValue.rg}
+                                                    onChange={(event) => setDialogValue({
+                                                        ...dialogValue, rg: event.target.value
+                                                    })}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} className={classes.dialogPadding}>
+                                                <Grid container spacing={1} alignItems="flex-end">
+                                                    <Grid item>
+                                                        <ContactMailIcon />
+                                                    </Grid>
+                                                    <Grid>
+                                                        <TextField
+                                                            label="e-mail"
+                                                            autoFocus
+                                                            margin="dense"
+                                                            id="mail"
+                                                            className={classes.dialogForm}
+                                                            value={dialogValue.mail}
+                                                            onChange={(event) => setDialogValue({
+                                                                ...dialogValue, mail: event.target.value
+                                                            })}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid item xs={6} className={classes.dialogPadding}>
+                                                <Grid container spacing={1} alignItems="flex-end">
+                                                    <Grid item>
+                                                        <PhoneIcon />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            label="Telefone"
+                                                            autoFocus
+                                                            margin="dense"
+                                                            id="fone"
+                                                            className={classes.dialogForm}
+                                                            value={dialogValue.fone}
+                                                            onChange={(event) => setDialogValue({
+                                                                ...dialogValue, fone: event.target.value
+                                                            })}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid item xs={6} className={classes.dialogPadding}>
+                                                <Grid container spacing={1} alignItems="flex-end">
+                                                    <Grid item>
+                                                        <PhoneAndroidIcon />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            label="Celular"
+                                                            autoFocus
+                                                            margin="dense"
+                                                            id="celular"
+                                                            className={classes.dialogForm}
+                                                            value={dialogValue.celular}
+                                                            onChange={(event) => setDialogValue({
+                                                                ...dialogValue, celular: event.target.value
+                                                            })}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
                                     </DialogContent>
                                     <DialogActions>
-                                        <Button onClick={handleClose} color="primary">
+                                        <Button 
+                                            variant="contained" 
+                                            onClick={handleClose} 
+                                            color="danger"
+                                            >
                                             Cancelar
                                         </Button>
-                                        <Button type="submit" color="primary">
+                                        <Button 
+                                            type="submit" 
+                                            variant="contained" 
+                                            color="primary"
+                                        >
                                             Adicionar
                                         </Button>
                                     </DialogActions>
