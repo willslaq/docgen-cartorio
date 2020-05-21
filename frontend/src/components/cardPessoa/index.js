@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -30,6 +30,7 @@ import PersonIcon from '@material-ui/icons/Person';
 
 const useStyles = makeStyles(theme => ({
     controlaPaper: {
+        borderRadius: 30,
         padding: theme.spacing(2),
         marginTop: 50,
         [theme.breakpoints.down('sm')]: {
@@ -58,28 +59,44 @@ const useStyles = makeStyles(theme => ({
         },
     },
     pesquisa: {
-        width: 300,
+        width: 260,
     },
     paperPesquisa: {
-        width: 300,
-        marginTop: 50,
+        width: "75%",
+        borderRadius: '0px 30px 30px 0px',
     },
     controlaContainer: {
         padding: theme.spacing(2),
-        display: 'flex',
-        alignItems: 'center',
+    },
+    controlaFiltro: {
+        borderRadius: "30px 0px 0px 30px",
+        width: '25%',
+        backgroundColor: "#72bf44",
     },
     controlaArrow: {
         width: 100,
         height: 100,
         color: '#72bf44',
+        [theme.breakpoints.down('sm')]: {
+            height: 40,
+            width: 40,
+        },
     },
     dialogPadding: {
-        padding: theme.spacing(2),
+        [theme.breakpoints.up('sm')]: {
+            padding: theme.spacing(2),
+        },
     },
     dialogForm: {
         width: '100%',
-    }
+    },
+    formControl: {
+        // display: 'flex',
+        // alignItems: 'center',
+    },
+    buttonControl: {
+        margin: theme.spacing(1),
+    },
 }))
 
 export default function CardPessoa() {
@@ -104,6 +121,7 @@ export default function CardPessoa() {
 
         toggleOpen(false);
     };
+    
 
     const handleSubmit = (event) => {
         console.log("Salvei no banco: ", dialogValue.cpf, dialogValue.nome, dialogValue.rg)
@@ -154,37 +172,46 @@ export default function CardPessoa() {
         setFiltro(event.target.value);
     }
 
+
+
+
     return (
         <>
-            <Grid Container align="center">
-                <FormControl className={classes.formControl}>
-                    <InputLabel id="demo-simple-select-label">Age</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={filtro}
-                        onChange={handleChangeFiltro}
-                    >
-                        <MenuItem value={1}>Nome</MenuItem>
-                        <MenuItem value={2}>CPF</MenuItem>
-                    </Select>
-                </FormControl>
+            <Grid container align="center" className={classes.formControl}>
+                <Paper className={classes.controlaFiltro}>
+                    <Grid item>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={filtro}
+                                onChange={handleChangeFiltro}
+                                >
+                                <MenuItem value={1}>Nome</MenuItem>
+                                <MenuItem value={2}>CPF</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                </Paper>
                 <Paper className={classes.paperPesquisa}>
-                    <TextField
-                        className={classes.pesquisa}
-                        id="pesquisar"
-                        label="Pesquisar..."
-                        variant="outlined"
-                        value={pesquisa}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
-                        }}
-                        onChange={e => setPesquisa(e.target.value.toLowerCase())}
-                    />
+                    <Grid item>
+                            <TextField
+                                className={classes.pesquisa}
+                                id="pesquisar"
+                                label="Pesquisar..."
+                                // variant="outlined"
+                                value={pesquisa}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                onChange={e => setPesquisa(e.target.value.toLowerCase())}
+                            />
+                    </Grid>
                 </Paper>
             </Grid>
 
@@ -275,28 +302,20 @@ export default function CardPessoa() {
                                         </DialogContentText>
                                         <Grid container className={classes.dialogPadding}>
                                             <Grid item xs={12} className={classes.dialogPadding}>
-                                                <Grid container spacing={1} position="start">
-                                                    <Grid item>
-                                                        <PersonIcon />
-                                                    </Grid>
-                                                    <Grid item  className={classes.dialogForm}>
-                                                        <TextField 
-                                                            autoFocus
-                                                            label="Nome"
-                                                            className={classes.dialogForm}
-                                                            margin="dense"
-                                                            id="name"
-                                                            value={dialogValue.nome}
-                                                            onChange={(event) => setDialogValue({
-                                                                ...dialogValue, nome: event.target.value
-                                                            })}
-                                                        />
-                                                    </Grid>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid item xs={6} className={classes.dialogPadding}>
                                                 <TextField 
                                                     autoFocus
+                                                    label="Nome"
+                                                    className={classes.dialogForm}
+                                                    margin="dense"
+                                                    id="name"
+                                                    value={dialogValue.nome}
+                                                    onChange={(event) => setDialogValue({
+                                                        ...dialogValue, nome: event.target.value
+                                                    })}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={6} className={classes.dialogPadding}>
+                                                <TextField
                                                     label="CPF"
                                                     className={classes.dialogForm}
                                                     margin="dense"
@@ -307,10 +326,9 @@ export default function CardPessoa() {
                                                     })}
                                                 />
                                             </Grid>
-                                            <Grid item xs={6} className={classes.dialogPadding}>
+                                            <Grid item xs={12} sm={6} className={classes.dialogPadding}>
                                                 <TextField 
                                                     label="RG"
-                                                    autoFocus
                                                     margin="dense"
                                                     id="RG"
                                                     className={classes.dialogForm}
@@ -321,82 +339,66 @@ export default function CardPessoa() {
                                                 />
                                             </Grid>
                                             <Grid item xs={12} className={classes.dialogPadding}>
-                                                <Grid container spacing={1} alignItems="flex-end">
-                                                    <Grid item>
-                                                        <ContactMailIcon />
-                                                    </Grid>
-                                                    <Grid>
-                                                        <TextField
-                                                            label="e-mail"
-                                                            autoFocus
-                                                            margin="dense"
-                                                            id="mail"
-                                                            className={classes.dialogForm}
-                                                            value={dialogValue.mail}
-                                                            onChange={(event) => setDialogValue({
-                                                                ...dialogValue, mail: event.target.value
-                                                            })}
-                                                        />
-                                                    </Grid>
-                                                </Grid>
+                                                <TextField
+                                                    label="e-mail"
+                                                    margin="dense"
+                                                    id="mail"
+                                                    className={classes.dialogForm}
+                                                    value={dialogValue.mail}
+                                                    onChange={(event) => setDialogValue({
+                                                        ...dialogValue, mail: event.target.value
+                                                    })}
+                                                />
                                             </Grid>
-                                            <Grid item xs={6} className={classes.dialogPadding}>
-                                                <Grid container spacing={1} alignItems="flex-end">
-                                                    <Grid item>
-                                                        <PhoneIcon />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <TextField
-                                                            label="Telefone"
-                                                            autoFocus
-                                                            margin="dense"
-                                                            id="fone"
-                                                            className={classes.dialogForm}
-                                                            value={dialogValue.fone}
-                                                            onChange={(event) => setDialogValue({
-                                                                ...dialogValue, fone: event.target.value
-                                                            })}
-                                                        />
-                                                    </Grid>
-                                                </Grid>
+                                            <Grid item xs={12} sm={6} className={classes.dialogPadding}>
+                                                <TextField
+                                                    label="Telefone"
+                                                    margin="dense"
+                                                    id="fone"
+                                                    className={classes.dialogForm}
+                                                    value={dialogValue.fone}
+                                                    onChange={(event) => setDialogValue({
+                                                        ...dialogValue, fone: event.target.value
+                                                    })}
+                                                />
                                             </Grid>
-                                            <Grid item xs={6} className={classes.dialogPadding}>
-                                                <Grid container spacing={1} alignItems="flex-end">
-                                                    <Grid item>
-                                                        <PhoneAndroidIcon />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <TextField
-                                                            label="Celular"
-                                                            autoFocus
-                                                            margin="dense"
-                                                            id="celular"
-                                                            className={classes.dialogForm}
-                                                            value={dialogValue.celular}
-                                                            onChange={(event) => setDialogValue({
-                                                                ...dialogValue, celular: event.target.value
-                                                            })}
-                                                        />
-                                                    </Grid>
-                                                </Grid>
+                                            <Grid item xs={12} sm={6} className={classes.dialogPadding}>
+                                                <TextField
+                                                    label="Celular"
+                                                    margin="dense"
+                                                    id="celular"
+                                                    className={classes.dialogForm}
+                                                    value={dialogValue.celular}
+                                                    onChange={(event) => setDialogValue({
+                                                        ...dialogValue, celular: event.target.value
+                                                    })}
+                                                />
                                             </Grid>
                                         </Grid>
                                     </DialogContent>
                                     <DialogActions>
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={handleClose} 
-                                            color="danger"
-                                            >
-                                            Cancelar
-                                        </Button>
-                                        <Button 
-                                            type="submit" 
-                                            variant="contained" 
-                                            color="primary"
-                                        >
-                                            Adicionar
-                                        </Button>
+                                        <Grid container>
+                                            <Grid item align="right" xs={6}>
+                                                <Button
+                                                    className={classes.buttonControl}
+                                                    variant="contained" 
+                                                    onClick={handleClose} 
+                                                    color="danger"
+                                                    >
+                                                    Cancelar
+                                                </Button>
+                                            </Grid>
+                                            <Grid item align="left" xs={6}>
+                                                <Button 
+                                                    className={classes.buttonControl}
+                                                    type="submit" 
+                                                    variant="contained" 
+                                                    color="primary"
+                                                >
+                                                    Adicionar
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
                                     </DialogActions>
                                 </form>
                             </Dialog>
