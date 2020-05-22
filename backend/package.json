@@ -4,12 +4,20 @@
   "description": "Backend da aplicação de gerenciamento de cartórios",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "start": "nodemon src/server.js"
   },
   "keywords": [
     "backend",
     "api"
   ],
   "author": "Willinghan B. Tomaz",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.15"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
 }

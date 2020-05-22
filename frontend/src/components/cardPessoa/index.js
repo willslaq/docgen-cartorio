@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import avatar from '../../assets/images/avatar.png';
@@ -13,7 +13,6 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Dialog from '@material-ui/core/Dialog';
@@ -23,16 +22,25 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import PhoneAndroidIcon from '@material-ui/icons/PhoneAndroid';
-import PhoneIcon from '@material-ui/icons/Phone';
-import ContactMailIcon from '@material-ui/icons/ContactMail';
-import PersonIcon from '@material-ui/icons/Person';
+
+const removeFocus = createMuiTheme({
+    overrides: {
+        MuiSelect: {
+            select: {
+                "&:focus": {
+                    background: "&labelcolor"
+                }
+            }
+        }
+    }
+});
 
 const useStyles = makeStyles(theme => ({
-    controlaPaper: {
-        borderRadius: 30,
+    controlaLista: {
+        borderRadius: 20,
         padding: theme.spacing(2),
-        marginTop: 50,
+        marginTop: 30,
+        marginBottom: 20,
         [theme.breakpoints.down('sm')]: {
             padding: 0,
         },
@@ -59,19 +67,25 @@ const useStyles = makeStyles(theme => ({
         },
     },
     pesquisa: {
-        width: 260,
+        width: '90%',
+        padding: theme.spacing(1),
     },
     paperPesquisa: {
-        width: "75%",
+        [theme.breakpoints.down('sm')]: {
+            width: "75%",
+        },
         borderRadius: '0px 30px 30px 0px',
     },
     controlaContainer: {
         padding: theme.spacing(2),
+        alignItems: 'center',
     },
     controlaFiltro: {
-        borderRadius: "30px 0px 0px 30px",
-        width: '25%',
+        [theme.breakpoints.down('sm')]: {
+            width: '25%',
+        },
         backgroundColor: "#72bf44",
+        borderRadius: "30px 0px 0px 30px",
     },
     controlaArrow: {
         width: 100,
@@ -91,11 +105,24 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
     },
     formControl: {
-        // display: 'flex',
-        // alignItems: 'center',
+        padding: theme.spacing(1),
     },
     buttonControl: {
         margin: theme.spacing(1),
+    },
+    controlaBarraPesquisa: {
+        justifyContent: 'center',
+        marginTop: 30,
+    },
+    selectStyle: {
+        fontWeight: 'bold',
+        color: '#FFF',
+    },
+    MuiSelectIcon: {
+        color: "#FFF"
+    },
+    icon: {
+        fill: '#fff',
     },
 }))
 
@@ -110,13 +137,11 @@ export default function CardPessoa() {
     const [dialogValue, setDialogValue] = useState({
         nome: '',
         cpf: '',
-        rg: '',
     });
     const handleClose = () => {
         setDialogValue({
             nome: '',
             cpf: '',
-            rg: '',
         });
 
         toggleOpen(false);
@@ -124,12 +149,18 @@ export default function CardPessoa() {
     
 
     const handleSubmit = (event) => {
-        console.log("Salvei no banco: ", dialogValue.cpf, dialogValue.nome, dialogValue.rg)
+        console.log("Salvei no banco: ", 
+                    ' \nCPF:', dialogValue.cpf,
+                    ' \nNome:', dialogValue.nome, 
+                    ' \nRG', dialogValue.rg,
+                    ' \nEmail', dialogValue.mail,
+                    ' \nTelefone', dialogValue.fone,
+                    ' \nCelular', dialogValue.celular,
+                    )
         event.preventDefault();
         setValue({
             nome: dialogValue.nome,
             cpf: dialogValue.cpf,
-            rg: dialogValue.rg,
         });
     };
 
@@ -139,13 +170,11 @@ export default function CardPessoa() {
                 setDialogValue({
                     nome: pesquisa,
                     cpf: '',
-                    rg: '',
                 });
             } else {
                 setDialogValue({
                     nome: '',
                     cpf: pesquisa,
-                    rg: '',
                 });
             }
     };
@@ -177,21 +206,22 @@ export default function CardPessoa() {
 
     return (
         <>
-            <Grid container align="center" className={classes.formControl}>
+            <Grid container className={classes.controlaBarraPesquisa} alignItems="center">
                 <Paper className={classes.controlaFiltro}>
                     <Grid item>
-                        <FormControl className={classes.formControl}>
-                            <InputLabel id="demo-simple-select-label">Age</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={filtro}
-                                onChange={handleChangeFiltro}
-                                >
-                                <MenuItem value={1}>Nome</MenuItem>
-                                <MenuItem value={2}>CPF</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <MuiThemeProvider theme={removeFocus}>
+                            <FormControl className={classes.formControl}>
+                                <Select
+                                    value={filtro}
+                                    onChange={handleChangeFiltro}
+                                    disableUnderline={true}
+                                    className={classes.selectStyle}
+                                    >
+                                    <MenuItem value={1}>Nome</MenuItem>
+                                    <MenuItem value={2}>CPF</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </MuiThemeProvider>
                     </Grid>
                 </Paper>
                 <Paper className={classes.paperPesquisa}>
@@ -199,8 +229,6 @@ export default function CardPessoa() {
                             <TextField
                                 className={classes.pesquisa}
                                 id="pesquisar"
-                                label="Pesquisar..."
-                                // variant="outlined"
                                 value={pesquisa}
                                 InputProps={{
                                     startAdornment: (
@@ -208,6 +236,10 @@ export default function CardPessoa() {
                                             <SearchIcon />
                                         </InputAdornment>
                                     ),
+                                    disableUnderline: true,
+                                    classes: {
+                                        icon: classes.icon,
+                                    }
                                 }}
                                 onChange={e => setPesquisa(e.target.value.toLowerCase())}
                             />
@@ -215,7 +247,7 @@ export default function CardPessoa() {
                 </Paper>
             </Grid>
 
-            <Paper className={classes.controlaPaper}>
+            <Paper className={classes.controlaLista}>
                 <Container>
                     {pessoaFiltrada.length > 0 ? pessoaFiltrada.map(pessoa => (
                         <>
@@ -352,7 +384,7 @@ export default function CardPessoa() {
                                             </Grid>
                                             <Grid item xs={12} sm={6} className={classes.dialogPadding}>
                                                 <TextField
-                                                    label="Telefone"
+                                                    label="Telefone Principal"
                                                     margin="dense"
                                                     id="fone"
                                                     className={classes.dialogForm}
@@ -364,7 +396,7 @@ export default function CardPessoa() {
                                             </Grid>
                                             <Grid item xs={12} sm={6} className={classes.dialogPadding}>
                                                 <TextField
-                                                    label="Celular"
+                                                    label="Telefone Secundário"
                                                     margin="dense"
                                                     id="celular"
                                                     className={classes.dialogForm}
@@ -411,28 +443,28 @@ export default function CardPessoa() {
 };
 
 const resultadoPessoa = [
-    { nome: 'Willinghan B. Tomaz', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Vinicius', cpf: '12341574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Leandro', cpf: '45641574958', rg: '123935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Willian', cpf: '78941574958', rg: '674935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gerson', cpf: '12341574958', rg: '456935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Maria', cpf: '10041574958', rg: '789935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Leopolda', cpf: '10041574958', rg: '123935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Tunica', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Margarete', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josefa', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Cleiton', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Cremilda', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josefina', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josesclaudilene', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Targarida', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gunhild', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gofrid', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Frey', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Freya', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Tyr', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Odin', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Thor', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Skati', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Fenrir', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
+    { nome: 'Willinghan B. Tomaz', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Vinicius', cpf: '12341574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Leandro', cpf: '45641574958', fone: '123935957', cidade: 'Cruziero do Oeste' },
+    { nome: 'Willian', cpf: '78941574958', fone: '674935957', cidade: 'Cruziero do Oeste' },
+    { nome: 'Gerson', cpf: '12341574958', fone: '456935957', cidade: 'Cruziero do Oeste' },
+    { nome: 'Maria', cpf: '10041574958', fone: '789935957', cidade: 'Cruziero do Oeste' },
+    { nome: 'Leopolda', cpf: '10041574958', fone: '123935957', cidade: 'Cruziero do Oeste' },
+    { nome: 'Tunica', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Mafonearete', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Josefa', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Cleiton', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Cremilda', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Josefina', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Josesclaudilene', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Tafonearida', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Gunhild', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Gofrid', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Frey', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Freya', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Tyr', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Odin', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Thor', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Skati', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
+    { nome: 'Fenrir', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
 ];
