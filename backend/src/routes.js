@@ -1,8 +1,10 @@
 const express = require('express');
 
+const PessoaController = require('./controllers/PessoaController')
 
 const routes = express.Router();
 
-routes.post('/pessoa/lista', console.log('hello world!'));
+
+routes.post('/home', PessoaController.list);
 
 module.exports = routes;
