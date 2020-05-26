@@ -6,5 +6,7 @@ const routes = express.Router();
 
 
 routes.post('/home', PessoaController.list);
+routes.post('/pessoa/add', PessoaController.create);
+routes.post('/pessoa/update', PessoaController.update);
 
 module.exports = routes;
