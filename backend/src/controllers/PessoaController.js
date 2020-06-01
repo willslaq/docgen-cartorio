@@ -26,12 +26,14 @@ module.exports = {
     },
 
     async update(req, res) {
-        const { nome, cpf, rg, email, fonePrincipal, foneSecundario } = req.body;
+        const { nome, cpf, rg, email, fonePrincipal, foneSecundario, id } = req.body;
+
+        console.log(req.body)
 
         const pessoa = req.pessoaId;
 
         await Pessoa.updateOne({
-            _id: pessoa
+            $and: [{ _id: id }, { pessoa }]
         }, {
             nome,
             cpf,
@@ -50,3 +52,6 @@ module.exports = {
         });
     }
 };
+
+
+
