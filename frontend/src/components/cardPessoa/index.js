@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { makeStyles, MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
@@ -22,6 +22,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import api from '../../services/api';
 
 const removeFocus = createMuiTheme({
     overrides: {
@@ -124,6 +125,10 @@ const useStyles = makeStyles(theme => ({
     icon: {
         fill: '#fff',
     },
+    controlaAddButtonInicial: {
+        position: "letf-bottom",
+        display: "float",
+    },
 }))
 
 export default function CardPessoa() {
@@ -134,6 +139,7 @@ export default function CardPessoa() {
     const [filtro, setFiltro] = useState(1);
     const [open, toggleOpen] = useState(false);
     const [value, setValue] = useState(null);
+    const [listaPessoa, setListaPessoa] = useState([]);
     const [dialogValue, setDialogValue] = useState({
         nome: '',
         cpf: '',
@@ -147,16 +153,33 @@ export default function CardPessoa() {
         toggleOpen(false);
     };
     
+    let dataSend = {
+        nome: dialogValue.nome,
+        cpf: dialogValue.cpf,
+        rg: dialogValue.rg,
+        email: dialogValue.email,
+        fonePrincipal: dialogValue.fonePrincipal,
+        foneSecundario: dialogValue.foneSecundario,
+    }
 
-    const handleSubmit = (event) => {
-        console.log("Salvei no banco: ", 
-                    ' \nCPF:', dialogValue.cpf,
-                    ' \nNome:', dialogValue.nome, 
-                    ' \nRG', dialogValue.rg,
-                    ' \nEmail', dialogValue.mail,
-                    ' \nTelefone', dialogValue.fone,
-                    ' \nCelular', dialogValue.celular,
-                    )
+    useEffect(
+        () => {
+            async function search() {
+                const resultadoPessoaAPI = await api.post("home");
+                console.log(resultadoPessoaAPI);
+                setListaPessoa(resultadoPessoaAPI.data);
+            }
+
+            
+            search()
+            
+        }, []
+    );
+        console.log(listaPessoa);
+        
+    const handleSubmit = async (event) => {
+        const resultadoCadastroPessoa = await api.post("pessoa-add", dataSend);
+        console.log(resultadoCadastroPessoa);
         event.preventDefault();
         setValue({
             nome: dialogValue.nome,
@@ -179,7 +202,7 @@ export default function CardPessoa() {
             }
     };
 
-    let pessoaFiltrada = resultadoPessoa.filter(
+    let pessoaFiltrada = listaPessoa.filter(
         (pessoa) => {
             if (filtro === 1) {
                 return pessoa.nome.toLowerCase().indexOf(pesquisa) !== -1;
@@ -202,10 +225,21 @@ export default function CardPessoa() {
     }
 
 
+    function AddButton() {
+        return (
+            <IconButton aria-label="Add" onClick={handleDialog}>
+                <AddCircleIcon className={classes.controlaArrow} />
+            </IconButton>
+        )
+    }
 
 
     return (
         <>
+            <Fragment className={classes.controlaAddButtonInicial}>
+                {AddButton()}
+            </Fragment>
+
             <Grid container className={classes.controlaBarraPesquisa} alignItems="center">
                 <Paper className={classes.controlaFiltro}>
                     <Grid item>
@@ -319,9 +353,7 @@ export default function CardPessoa() {
                                     </Typography>
                                 </Grid>
                                 <Grid item align="center" xs={4}>
-                                    <IconButton aria-label="Add" onClick={handleDialog}>
-                                        <AddCircleIcon className={classes.controlaArrow} />
-                                    </IconButton>
+                                    {AddButton()}
                                 </Grid>
                             </Grid>
 
@@ -376,7 +408,7 @@ export default function CardPessoa() {
                                                     margin="dense"
                                                     id="mail"
                                                     className={classes.dialogForm}
-                                                    value={dialogValue.mail}
+                                                    value={dialogValue.email}
                                                     onChange={(event) => setDialogValue({
                                                         ...dialogValue, mail: event.target.value
                                                     })}
@@ -388,9 +420,9 @@ export default function CardPessoa() {
                                                     margin="dense"
                                                     id="fone"
                                                     className={classes.dialogForm}
-                                                    value={dialogValue.fone}
+                                                    value={dialogValue.fonePrincipal}
                                                     onChange={(event) => setDialogValue({
-                                                        ...dialogValue, fone: event.target.value
+                                                        ...dialogValue, fonePrincipal: event.target.value
                                                     })}
                                                 />
                                             </Grid>
@@ -400,9 +432,9 @@ export default function CardPessoa() {
                                                     margin="dense"
                                                     id="celular"
                                                     className={classes.dialogForm}
-                                                    value={dialogValue.celular}
+                                                    value={dialogValue.foneSecundario}
                                                     onChange={(event) => setDialogValue({
-                                                        ...dialogValue, celular: event.target.value
+                                                        ...dialogValue, foneSecundario: event.target.value
                                                     })}
                                                 />
                                             </Grid>
@@ -421,13 +453,13 @@ export default function CardPessoa() {
                                                 </Button>
                                             </Grid>
                                             <Grid item align="left" xs={6}>
-                                                <Button 
+                                                <Button
                                                     className={classes.buttonControl}
-                                                    type="submit" 
-                                                    variant="contained" 
+                                                    type="submit"
+                                                    variant="contained"
                                                     color="primary"
                                                 >
-                                                    Adicionar
+                                                        Adicionar
                                                 </Button>
                                             </Grid>
                                         </Grid>
@@ -441,30 +473,3 @@ export default function CardPessoa() {
         </>
     );
 };
-
-const resultadoPessoa = [
-    { nome: 'Willinghan B. Tomaz', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Vinicius', cpf: '12341574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Leandro', cpf: '45641574958', fone: '123935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Willian', cpf: '78941574958', fone: '674935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gerson', cpf: '12341574958', fone: '456935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Maria', cpf: '10041574958', fone: '789935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Leopolda', cpf: '10041574958', fone: '123935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Tunica', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Mafonearete', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josefa', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Cleiton', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Cremilda', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josefina', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josesclaudilene', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Tafonearida', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gunhild', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gofrid', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Frey', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Freya', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Tyr', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Odin', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Thor', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Skati', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-    { nome: 'Fenrir', cpf: '10041574958', fone: '44998317130', cidade: 'Cruziero do Oeste' },
-];
