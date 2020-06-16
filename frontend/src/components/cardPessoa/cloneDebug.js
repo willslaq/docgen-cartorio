@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState, useEffect } from 'react';
+import { makeStyles, MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import avatar from '../../assets/images/avatar.png';
@@ -8,17 +8,33 @@ import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import SearchIcon from '@material-ui/icons/Search';
-import ForwardIcon from '@material-ui/icons/Forward';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import api from '../../services/api';
+import AddButton from '../AddPessoaButton/index';
 
-
+const removeFocus = createMuiTheme({
+    overrides: {
+        MuiSelect: {
+            select: {
+                "&:focus": {
+                    background: "&labelcolor"
+                }
+            }
+        }
+    }
+});
 
 const useStyles = makeStyles(theme => ({
-    controlaPaper: {
+    controlaLista: {
+        borderRadius: 20,
         padding: theme.spacing(2),
-        marginTop: 50,
+        marginTop: 30,
+        marginBottom: 20,
         [theme.breakpoints.down('sm')]: {
             padding: 0,
         },
@@ -45,63 +61,163 @@ const useStyles = makeStyles(theme => ({
         },
     },
     pesquisa: {
-        width: 200,
+        width: '90%',
+        padding: theme.spacing(1),
     },
     paperPesquisa: {
-        width: 200,
-        marginTop: 50,  
+        [theme.breakpoints.down('sm')]: {
+            width: "75%",
+        },
+        borderRadius: '0px 30px 30px 0px',
     },
     controlaContainer: {
         padding: theme.spacing(2),
-        display: 'flex',
         alignItems: 'center',
+    },
+    controlaFiltro: {
+        [theme.breakpoints.down('sm')]: {
+            width: '25%',
+        },
+        backgroundColor: "#72bf44",
+        borderRadius: "30px 0px 0px 30px",
     },
     controlaArrow: {
         width: 100,
         height: 100,
         color: '#72bf44',
+        [theme.breakpoints.down('sm')]: {
+            height: 40,
+            width: 40,
+        },
+    },
+    formControl: {
+        padding: theme.spacing(1),
+    },
+    buttonControl: {
+        margin: theme.spacing(1),
+    },
+    controlaBarraPesquisa: {
+        justifyContent: 'center',
+        marginTop: 30,
+    },
+    selectStyle: {
+        fontWeight: 'bold',
+        color: '#FFF',
+    },
+    MuiSelectIcon: {
+        color: "#FFF"
+    },
+    icon: {
+        fill: '#fff',
+    },
+    controlaAddButtonInicial: {
+        position: "letf-bottom",
+        display: "float",
     },
 }))
+
+const estiloAddButton = { 
+        width: "width: 100,",
+        height: "height: 100,",
+        color: "color: '#72bf44',",
+        breakpoints: "[theme.breakpoints.down('sm')]",
+        height: "height: 40,",
+        width: "width: 40,",
+}
 
 export default function CardPessoa() {
 
     const classes = useStyles();
 
     const [pesquisa, setPesquisa] = useState('');
+    const [filtro, setFiltro] = useState(1);
+    const [listaPessoa, setListaPessoa] = useState([]);
+    
 
-    let pessoaFiltrada = resultadoPessoa.filter(
+    useEffect(
+        () => {
+            async function search() {
+                const resultadoPessoaAPI = await api.post("home");
+                console.log(resultadoPessoaAPI);
+                setListaPessoa(resultadoPessoaAPI.data);
+            }
+
+            
+            search()
+            
+        }, []
+    );
+        
+
+    let pessoaFiltrada = listaPessoa.filter(
         (pessoa) => {
-            return pessoa.nome.toLowerCase().indexOf(pesquisa) !== -1;
+            if (filtro === 1) {
+                return pessoa.nome.toLowerCase().indexOf(pesquisa) !== -1;
+            } else {
+                return pessoa.cpf.toLowerCase().indexOf(pesquisa) !== -1;
+            }
         }
     );
 
+    function retornoVazio() {
+        if (filtro === 1) {
+            return <>Adicionar o Cliente "{pesquisa}"</>;
+        } else {
+            return <>Adicionar o CPF "{pesquisa}"</>;
+        }
+    };
+
+    const handleChangeFiltro = event => {
+        setFiltro(event.target.value);
+    }
+
     return (
         <>
-            <Grid Container align="center">
+            <Grid container className={classes.controlaBarraPesquisa} alignItems="center">
+                <Paper className={classes.controlaFiltro}>
+                    <Grid item>
+                        <MuiThemeProvider theme={removeFocus}>
+                            <FormControl className={classes.formControl}>
+                                <Select
+                                    value={filtro}
+                                    onChange={handleChangeFiltro}
+                                    disableUnderline={true}
+                                    className={classes.selectStyle}
+                                    >
+                                    <MenuItem value={1}>Nome</MenuItem>
+                                    <MenuItem value={2}>CPF</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </MuiThemeProvider>
+                    </Grid>
+                </Paper>
                 <Paper className={classes.paperPesquisa}>
-                    <TextField
-                        className={classes.pesquisa}
-                        id="pesquisar"
-                        label="Pesquisar..."
-                        variant="outlined"
-                        value={pesquisa}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
-                        }}
-                        onChange={e => setPesquisa(e.target.value.toLowerCase())}
-                    />
+                    <Grid item>
+                            <TextField
+                                className={classes.pesquisa}
+                                id="pesquisar"
+                                value={pesquisa}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    ),
+                                    disableUnderline: true,
+                                    // classes: {
+                                    //     icon: classes.icon,
+                                    // }
+                                }}
+                                onChange={e => setPesquisa(e.target.value.toLowerCase())}
+                            />
+                    </Grid>
                 </Paper>
             </Grid>
 
-            <Paper className={classes.controlaPaper}>
+            <Paper className={classes.controlaLista}>
                 <Container>
                     {pessoaFiltrada.length > 0 ? pessoaFiltrada.map(pessoa => (
                         <>
-                            {console.log(pessoaFiltrada)}
                             <Grid container className={classes.controlaContainer}>
                                 <Grid item xs={4}>
                                     <img alt="" src={avatar} className={classes.controlaAvatar} />
@@ -148,60 +264,35 @@ export default function CardPessoa() {
                                     </Grid>
                                 </Grid>
                                 <Grid item xs={4} align="center">
-                                    <ForwardIcon className={classes.controlaArrow} />
+                                    <ArrowForwardIosIcon className={classes.controlaArrow} />
                                 </Grid>
                             </Grid>
                             <Divider />
                         </>
                     ))
                         :
-                        <Grid container className={classes.controlaContainer}>
-                            <Grid item xs={4}>
-                                <img alt="" src={avatarErro} className={classes.controlaAvatar} />
+                        <>
+                            <Grid container className={classes.controlaContainer}>
+                                <Grid item xs={4}>
+                                    <img alt="" src={avatarErro} className={classes.controlaAvatar} />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography
+                                        variant="h4"
+                                        component="h4"
+                                        className={classes.controlaNome}
+                                    >
+                                        {retornoVazio()}
+                                    </Typography>
+                                </Grid>
+                                <Grid item align="center" xs={4}>
+                                    <AddButton estilo={estiloAddButton} />
+                                </Grid>
                             </Grid>
-                            <Grid item xs={4}>
-                                <Typography
-                                    variant="h4"
-                                    component="h4"
-                                    className={classes.controlaNome}
-                                >
-                                    Adicionar o Cliente "{pesquisa}"
-                                </Typography>
-                            </Grid>
-                            <Grid item align="center" xs={4}>
-                                <AddCircleIcon className={classes.controlaArrow} />
-                            </Grid>
-                        </Grid>
+                        </>
                     }
                 </Container>
             </Paper>
         </>
     );
 };
-
-const resultadoPessoa = [
-    { nome: 'Willinghan B. Tomaz', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Vinicius', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Leandro', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Willian', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gerson', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Maria', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Leopolda', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Tunica', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Margarete', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josefa', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Cleiton', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Cremilda', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josefina', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Josesclaudilene', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Targarida', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gunhild', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Gofrid', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Frey', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Freya', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Tyr', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Odin', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Thor', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Skati', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-    { nome: 'Fenrir', cpf: '10041574958', rg: '143935957', cidade: 'Cruziero do Oeste' },
-];
