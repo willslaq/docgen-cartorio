@@ -12,7 +12,9 @@ import CardPessoa from '../../components/CardPessoa/cloneDebug';
 
 const useStyles = makeStyles(theme => ({
     controlaButton: {
-        position: "fixed"
+        position: "fixed",
+        width: 100,
+        height: 100,
     },
     dica: {
         margin: '0 auto',
@@ -27,38 +29,47 @@ const useStyles = makeStyles(theme => ({
         padding: '20px',
         position: 'relative',
         marginTop: '30px',
-        '&::after': {
-            content: "",
-            width: 0,
-            height: 0,
-            position: 'absolute',
-            borderLeft: '20px solid transparent',
-            borderRight: '20px solid transparent',
-            /*Faz seta "apontar para baixo. Definir o valor como 'top' fará ela "apontar para cima" */
-            /*Aqui entra a cor da "aba" do balão */
-            borderBottom: '20px solid #7e57c2',
-            top: '-20px', /*localização. Experimente alterar para 'bottom'*/
-            left: '20%',
-        }
+        // '&::after': {
+        //     content: "",
+        //     width: 0,
+        //     height: 0,
+        //     position: 'absolute',
+        //     borderLeft: '20px solid transparent',
+        //     borderRight: '20px solid transparent',
+        //     /*Faz seta "apontar para baixo. Definir o valor como 'top' fará ela "apontar para cima" */
+        //     /*Aqui entra a cor da "aba" do balão */
+        //     borderBottom: '20px solid #7e57c2',
+        //     top: '-20px', /*localização. Experimente alterar para 'bottom'*/
+        //     left: '20%',
+        // }
+    },
+    controlaCadastro: {
+        maxWidth: 300,
+        // position: 'fixed'
     }
 }))
 
-export default function Home() {
+export default function Home(props, { history }) {
+
+
+    console.log(props);
 
     const classes = useStyles();
 
     return (
         <>
             <NavBar />
-            <div className={classes.controlaButton}>
-                <AddPesoaButton />
+            <div className={classes.controlaCadastro}>
+                <div className={classes.controlaButton}>
+                    <AddPesoaButton {...props} />
+                </div>
                 <div className={classes.dica}>
                     Utilize o botão acima para cadastrar uma nova pessoa.
                 </div>
             </div>
             <Container maxWidth="md" style={{ marginTop: 10 }}>
                 {/* <FreeSoloCreateOptionDialog /> */}
-                <CardPessoa />
+                <CardPessoa {...props} />
             </Container>
         </>
     )

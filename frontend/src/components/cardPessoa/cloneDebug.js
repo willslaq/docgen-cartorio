@@ -16,6 +16,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import api from '../../services/api';
 import AddButton from '../AddPessoaButton/index';
+import { withRouter } from 'react-router-dom';
 
 const removeFocus = createMuiTheme({
     overrides: {
@@ -110,22 +111,13 @@ const useStyles = makeStyles(theme => ({
     icon: {
         fill: '#fff',
     },
-    controlaAddButtonInicial: {
-        position: "letf-bottom",
-        display: "float",
-    },
+    controlaButton: {
+        width: 100,
+        height: 100,
+    }
 }))
 
-const estiloAddButton = { 
-        width: "width: 100,",
-        height: "height: 100,",
-        color: "color: '#72bf44',",
-        breakpoints: "[theme.breakpoints.down('sm')]",
-        height: "height: 40,",
-        width: "width: 40,",
-}
-
-export default function CardPessoa() {
+function CardPessoa(props, { history }) {
 
     const classes = useStyles();
 
@@ -137,7 +129,7 @@ export default function CardPessoa() {
     useEffect(
         () => {
             async function search() {
-                const resultadoPessoaAPI = await api.post("home");
+                const resultadoPessoaAPI = await api.post("pessoas");
                 console.log(resultadoPessoaAPI);
                 setListaPessoa(resultadoPessoaAPI.data);
             }
@@ -147,14 +139,16 @@ export default function CardPessoa() {
             
         }, []
     );
-        
+    
+    function vaiPessoaUnica(pessoaId) {
+        console.log(props);
+        props.history.push(`/pessoas/${pessoaId}`)
+    }
 
     let pessoaFiltrada = listaPessoa.filter(
         (pessoa) => {
             if (filtro === 1) {
                 return pessoa.nome.toLowerCase().indexOf(pesquisa) !== -1;
-            } else {
-                return pessoa.cpf.toLowerCase().indexOf(pesquisa) !== -1;
             }
         }
     );
@@ -218,7 +212,10 @@ export default function CardPessoa() {
                 <Container>
                     {pessoaFiltrada.length > 0 ? pessoaFiltrada.map(pessoa => (
                         <>
-                            <Grid container className={classes.controlaContainer}>
+                            <Grid 
+                                container 
+                                className={classes.controlaContainer}
+                            >
                                 <Grid item xs={4}>
                                     <img alt="" src={avatar} className={classes.controlaAvatar} />
                                 </Grid>
@@ -264,7 +261,10 @@ export default function CardPessoa() {
                                     </Grid>
                                 </Grid>
                                 <Grid item xs={4} align="center">
-                                    <ArrowForwardIosIcon className={classes.controlaArrow} />
+                                    <ArrowForwardIosIcon 
+                                        className={classes.controlaArrow} 
+                                        onClick={() => vaiPessoaUnica(pessoa._id)}
+                                    />
                                 </Grid>
                             </Grid>
                             <Divider />
@@ -286,7 +286,9 @@ export default function CardPessoa() {
                                     </Typography>
                                 </Grid>
                                 <Grid item align="center" xs={4}>
-                                    <AddButton estilo={estiloAddButton} />
+                                    <div className={classes.controlaButton}>
+                                        <AddButton />
+                                    </div>
                                 </Grid>
                             </Grid>
                         </>
@@ -296,3 +298,5 @@ export default function CardPessoa() {
         </>
     );
 };
+
+export default withRouter(CardPessoa);

@@ -22,13 +22,13 @@ const useStyles = makeStyles((theme, params) => ({
         width: '100%',
     },
     buttonAdd: {
-        width: 100,
-        height: 100,
+        width: '100%',
+        height: '100%',
         color: '#72bf44',
-        [theme.breakpoints.down('sm')]: {
-            height: 40,
-            width: 40,
-        },
+        // [theme.breakpoints.down('sm')]: {
+        //     height: 40,
+        //     width: 40,
+        // },
     }
 }))
 
